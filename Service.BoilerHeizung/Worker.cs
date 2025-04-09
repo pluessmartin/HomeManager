@@ -111,19 +111,21 @@ namespace Service.BoilerHeizung
                 if(boilerHeizungDto != null && electricMeterDataDto != null)
                 {
                     var power = CalcPower(boilerHeizungDto, electricMeterDataDto);
+                    _logger.LogInformation("Set New Power1 neu alt " + power + " " + boilerHeizungDto.power_ac9);
+                    if (power != boilerHeizungDto.power_ac9){
 
-                    if(power != boilerHeizungDto.power_ac9){
-
+                        _logger.LogInformation("Set New Power2 neu alt " + power + " " + boilerHeizungDto.power_ac9);
                         var clientMyPV = new HttpClient();
                         clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
                         clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
-                        BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 10, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+                        BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 180, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
 
                         var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
                         if (response.IsSuccessStatusCode)
                         {
                             var str = await response.Content.ReadAsStringAsync();
                         }
+                    _logger.LogInformation("Set New Power end neu alt " + power + " " + boilerHeizungDto.power_ac9);
                     }
                 }
             }
@@ -131,12 +133,14 @@ namespace Service.BoilerHeizung
 
         private int CalcPower(BoilerHeizungDto boilerHeizungDto, ElectricMeterDataDto electricMeterDataDto)
         {
+
             int powerAktuell = (int)electricMeterDataDto.currentPowerSum ;
+
+            int test = boilerHeizungDto.power_ac9 - powerAktuell;
             if ((boilerHeizungDto.power_ac9 - powerAktuell) < 1500)
             {
                 return 0;
             }
-
             int newPower = ((powerAktuell * -1) + boilerHeizungDto.power_ac9) - 200;
 
             if (checkedPowerSize(newPower, boilerHeizungDto.power_ac9))
