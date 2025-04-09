@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\40_CrossCutting\CrossCutting.Utility\CrossCutting.Utility.csproj" />
-    <ProjectReference Include="..\Business.Dto\Business.Dto.csproj" />
+    <ProjectReference Include="..\..\20_Business\Business.Dto\Business.Dto.csproj" />
+    <ProjectReference Include="..\..\40_CrossCutting\CrossCutting.Utility\CrossCutting.Utility.csproj" />
   </ItemGroup>
 </Project>
