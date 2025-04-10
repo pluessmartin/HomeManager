@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BoilerHeizung", "70
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Dto", "20_Business\Business.Dto\Business.Dto.csproj", "{F13538C2-7889-F6C0-7D49-DE98300A9217}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapDrive", "90_Tools\MapDrive\MapDrive.csproj", "{9963AC0A-3029-4145-B20D-E8043CFD5DAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{F13538C2-7889-F6C0-7D49-DE98300A9217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F13538C2-7889-F6C0-7D49-DE98300A9217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F13538C2-7889-F6C0-7D49-DE98300A9217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9963AC0A-3029-4145-B20D-E8043CFD5DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9963AC0A-3029-4145-B20D-E8043CFD5DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9963AC0A-3029-4145-B20D-E8043CFD5DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9963AC0A-3029-4145-B20D-E8043CFD5DAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{E933B708-1266-4A62-B40A-29960F9512D2} = {474CBDFD-5DE8-4761-AA16-A1F2F9122433}
 		{75746745-CEFE-092B-AFCB-165C4E67F7FA} = {3660C3CD-B21D-488F-9407-48EE7322ABB3}
 		{F13538C2-7889-F6C0-7D49-DE98300A9217} = {5DBDCE70-07E7-41EA-B11E-A01DEB1E21B0}
+		{9963AC0A-3029-4145-B20D-E8043CFD5DAF} = {35785184-15C2-4851-92C4-794832F082EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80E0FFD2-C227-4332-B10F-0CB71CD191A7}

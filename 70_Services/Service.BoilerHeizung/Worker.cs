@@ -45,7 +45,7 @@ namespace Service.BoilerHeizung
                         await Work();
                     }catch(Exception ex)
                     {
-                        _logger.LogError("Error Worker :", ex);
+                        _logger.LogError("Error Worker : " + ex.Message);
                     }
                 }
                 await Task.Delay(timeout * 1000, stoppingToken);
@@ -95,38 +95,58 @@ namespace Service.BoilerHeizung
 
             if (!string.IsNullOrEmpty(_options.ApiTokenMyPV))
             {
-                var clientMyPV = new HttpClient();
-                clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
-                clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
-                var response = await clientMyPV.GetAsync(_options.ApiSerialNumberMyPV +"/data");
-                if (response.IsSuccessStatusCode)
+                var clientMyPVData = new HttpClient();
+                clientMyPVData.BaseAddress = new Uri(_options.ApiUrlMyPV);
+                clientMyPVData.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
+                var responseData = await clientMyPVData.GetAsync(_options.ApiSerialNumberMyPV +"/data");
+                if (responseData.IsSuccessStatusCode)
                 {
-                    var str = await response.Content.ReadAsStringAsync();
+                    var str = await responseData.Content.ReadAsStringAsync();
                     boilerHeizungDto = JsonConvert.DeserializeObject<BoilerHeizungDto>(str);
                 }
-            }
 
-            if (!string.IsNullOrEmpty(_options.ApiTokenMyPV))
-            {
                 if(boilerHeizungDto != null && electricMeterDataDto != null)
                 {
-                    var power = CalcPower(boilerHeizungDto, electricMeterDataDto);
-                    _logger.LogInformation("Set New Power1 neu alt " + power + " " + boilerHeizungDto.power_ac9);
-                    if (power != boilerHeizungDto.power_ac9){
-
-                        _logger.LogInformation("Set New Power2 neu alt " + power + " " + boilerHeizungDto.power_ac9);
+                    _logger.LogInformation("State Heizung: " + boilerHeizungDto.ctrlstate);
+                    if (boilerHeizungDto.ctrlstate.Contains("Cloud Control"))
+                    {
                         var clientMyPV = new HttpClient();
                         clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
                         clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
-                        BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 180, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+                        BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 1, power = 0, timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
 
                         var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var str = await response.Content.ReadAsStringAsync();
-                        }
-                    _logger.LogInformation("Set New Power end neu alt " + power + " " + boilerHeizungDto.power_ac9);
                     }
+                    else
+                    {
+                        var power = CalcPower(boilerHeizungDto, electricMeterDataDto);
+                        if (power != boilerHeizungDto.power_ac9)
+                        {
+
+                            _logger.LogInformation("Set New Power neu alt " + power + " " + boilerHeizungDto.power_ac9);
+                            var clientMyPV = new HttpClient();
+                            clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
+                            clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
+                            BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 60, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+
+                            var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var str = await response.Content.ReadAsStringAsync();
+                            }
+                            _logger.LogInformation("End New Power neu alt " + power + " " + boilerHeizungDto.power_ac9);
+                        }
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("No Elektrodata");
+                    var clientMyPV = new HttpClient();
+                    clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
+                    clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
+                    BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 1, power = 0, timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+
+                    var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
                 }
             }
         }

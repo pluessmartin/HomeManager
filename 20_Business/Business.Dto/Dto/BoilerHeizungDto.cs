@@ -14,5 +14,6 @@ namespace Business.Dto.Dto
         public int power1_grid { get; set; }
         public int power2_grid { get; set; }
         public int power3_grid { get; set; }
+        public string ctrlstate { get; set; }
     }
 }
