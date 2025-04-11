@@ -108,7 +108,7 @@ namespace Service.BoilerHeizung
                 if(boilerHeizungDto != null && electricMeterDataDto != null)
                 {
                     _logger.LogInformation("State Heizung: " + boilerHeizungDto.ctrlstate);
-                    if (boilerHeizungDto.ctrlstate.Contains("Cloud Control"))
+                    if (boilerHeizungDto.ctrlstate.Contains("Cloud Control noch testen"))
                     {
                         var clientMyPV = new HttpClient();
                         clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
@@ -120,6 +120,8 @@ namespace Service.BoilerHeizung
                     else
                     {
                         var power = CalcPower(boilerHeizungDto, electricMeterDataDto);
+                        _logger.LogInformation("Power " + electricMeterDataDto.currentPowerSum + " " + power + " " + boilerHeizungDto.power_ac9);
+
                         if (power != boilerHeizungDto.power_ac9)
                         {
 
