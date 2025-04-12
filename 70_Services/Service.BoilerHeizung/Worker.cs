@@ -45,6 +45,18 @@ namespace Service.BoilerHeizung
                         await Work();
                     }catch(Exception ex)
                     {
+                        try
+                        {
+                            var clientMyPV = new HttpClient();
+                            clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
+                            clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
+                            BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 1, power = 0, timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+
+                            var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
+                        }catch(Exception ex2)
+                        {
+                            _logger.LogError("Error Worker : " + ex2.Message);
+                        }
                         _logger.LogError("Error Worker : " + ex.Message);
                     }
                 }
@@ -107,8 +119,8 @@ namespace Service.BoilerHeizung
 
                 if(boilerHeizungDto != null && electricMeterDataDto != null)
                 {
-                    _logger.LogInformation("State Heizung: " + boilerHeizungDto.ctrlstate);
-                    if (boilerHeizungDto.ctrlstate.Contains("Cloud Control noch testen"))
+                    _logger.LogInformation("State Heizung: " + boilerHeizungDto.ctrlstate + "Flag: " + boilerHeizungDto.screen_mode_flag);
+                    if (boilerHeizungDto.screen_mode_flag == 3)
                     {
                         var clientMyPV = new HttpClient();
                         clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
@@ -129,7 +141,7 @@ namespace Service.BoilerHeizung
                             var clientMyPV = new HttpClient();
                             clientMyPV.BaseAddress = new Uri(_options.ApiUrlMyPV);
                             clientMyPV.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiTokenMyPV);
-                            BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 60, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
+                            BoilerHeizungPowerDto boilerHeizungPowerDto = new BoilerHeizungPowerDto { validForMinutes = 30, power = (power * 2), timeBoostOverride = 0, timeBoostValue = 0, legionellaBoostBlock = 0, batteryDischargeBlock = 0 };
 
                             var response = await clientMyPV.PostAsJsonAsync(_options.ApiSerialNumberMyPV + "/power", boilerHeizungPowerDto);
                             if (response.IsSuccessStatusCode)
